@@ -374,12 +374,6 @@ clear ip nat translation *        # Reset NAT table
 
 ---
 
-## 📎 License
-
-This cheat sheet is released under the MIT License. Feel free to copy, modify, and share with attribution.
-
----
-
 ## 🧠 Contributions
 
 Contributions, corrections, and improvements are welcome. Open a pull request or create an issue!
@@ -387,4 +381,5 @@ Contributions, corrections, and improvements are welcome. Open a pull request or
 ---
 
 **Made with 💻 by Nidhal**
+** [LinkedIn](https://www.linkedin.com/in/nidhal-labri/) **
 
