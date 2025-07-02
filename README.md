@@ -291,7 +291,7 @@ ip access-list standard BLOCK_INTERNET
 
 ```bash
 interface FastEthernet0/0
- ip access-group 101 in
+ ip access-group 101 out
 exit
 
 access-list 23 permit 192.168.1.0 0.0.0.255
@@ -317,6 +317,7 @@ debug ip packet                  # Packet match logs (careful)
 ```
 
 > ⚠️ ACLs are processed top-down. First match wins. One ACL per direction/interface/protocol.
+
 > Best practice: Standard ACLs should be applied closest to the destination, extended ACLs closest to the source.
 
 ---
