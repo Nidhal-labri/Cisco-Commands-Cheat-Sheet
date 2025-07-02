@@ -6,7 +6,7 @@ A curated list of essential Cisco IOS commands for routers and switches. This ch
 
 ## 🔐 Modes Overview (Router/Switch)
 
-![image_2025-07-01_16-26-45](https://github.com/user-attachments/assets/aa447e87-33b4-451c-8600-aec5ecc416b0)
+<img width="540" alt="image_2025-07-02_16-58-45" src="https://github.com/user-attachments/assets/6d471feb-7491-4072-b4dd-b365cc798e85" />
 
 
 - **User EXEC Mode**: Limited command access, used for basic checks.
