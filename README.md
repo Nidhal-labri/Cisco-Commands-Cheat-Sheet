@@ -25,8 +25,8 @@ A curated list of essential Cisco IOS commands for routers and switches. This ch
 ```bash
 enable
 configure terminal
-no ip domain-lookup              # Disable DNS resolution for typos
-hostname S1/R1
+no ip domain-lookup              # Disable DNS resolution for mistyped commands
+hostname S1/R1    
 banner motd $ Authorized Access Only! $
 exit
 ```
@@ -43,7 +43,7 @@ line console 0
  exec-timeout 5                  # Auto-logout after 5 minutes
  login
 exit
-line vty 0 4
+line vty 0 4                     # Set VTY (remote access) password
  password cisco
  exec-timeout 5
  login
@@ -88,30 +88,30 @@ enable
 configure terminal
 hostname S1/R1
 ip domain-name nidhal.com
-username admin secret nidhal123
+username admin secret nidhal123     # Create local user
 crypto key generate rsa
- 1024
-ip ssh version 2
-ip ssh authentication-retries 3
-ip ssh time-out 60
+ 1024                               # Key size (in bits) can be 1024 or 2048
+ip ssh version 2                    # Use SSH version 2
+ip ssh authentication-retries 3     # Optional: retry attempts
+ip ssh time-out 60                  # Optional: SSH timeout
 line vty 0 15
- transport input ssh
- login local
- exec-timeout 5 0
- privilege level 15
+ transport input ssh                # Allow only SSH
+ login local                        # Authenticate using local user
+ exec-timeout 5 0                   # Auto-logout after 5 min
+ privilege level 15                 # Full admin access
 exit
-logging monitor debugging
+logging monitor debugging           # Optional: enable session logging
 end
 ```
 
 ### ✅ SSH Verification
 
 ```bash
-show ip ssh
-show ssh
-show run | include ssh
-show users
-debug ip ssh
+show ip ssh                         # SSH config and version
+show ssh                            # Active SSH sessions
+show run | include ssh              # SSH-related config
+show users                          # Connected users
+debug ip ssh                        # Debug SSH (use with care)
 ```
 
 ---
@@ -121,14 +121,14 @@ debug ip ssh
 ```bash
 enable
 configure terminal
-ip dhcp excluded-address 192.168.1.1 192.168.1.10
-ip dhcp excluded-address 192.168.1.254
+ip dhcp excluded-address 192.168.1.1 192.168.1.10   # Reserved addresses
+ip dhcp excluded-address 192.168.1.254              # Reserve single IP
 ip dhcp pool LAN-POOL
  network 192.168.1.0 255.255.255.0
  default-router 192.168.1.1
  dns-server 8.8.8.8 1.1.1.1
  domain-name nidhal.com
- lease 7
+ lease 7                                            # Lease in days
 exit
 ```
 
@@ -146,12 +146,12 @@ exit
 
 ```bash
 show running-config | include dhcp
-show ip dhcp binding
-show ip dhcp pool
-debug ip dhcp server events
-show ip dhcp server statistics
-clear ip dhcp binding *
-clear ip dhcp conflict *
+show ip dhcp binding               # DHCP leases
+show ip dhcp pool                  # DHCP pool stats
+debug ip dhcp server events       # Real-time DHCP logs
+show ip dhcp server statistics     # DHCP packet stats
+clear ip dhcp binding *            # Clear leases
+clear ip dhcp conflict *           # Clear conflicts
 ```
 
 ---
@@ -169,21 +169,22 @@ exit
 vlan 99
  name Management
 exit
-no vlan 20
+
+no vlan 20                         # Delete VLAN 20
 ```
 
 ### VLAN Port Assignments
 
 ```bash
 interface FastEthernet0/1
- switchport mode access
- switchport access vlan 10
+ switchport mode access            # Access mode
+ switchport access vlan 10         # Assign VLAN 10
 exit
 
 interface FastEthernet0/2
  switchport mode access
  switchport access vlan 20
- switchport voice vlan 30
+ switchport voice vlan 30          # Optional for IP phones
 exit
 ```
 
@@ -204,16 +205,15 @@ interface vlan 99
  ip address 192.168.99.1 255.255.255.0
  no shutdown
 exit
-ip default-gateway 192.168.99.254
+ip default-gateway 192.168.99.254   # Gateway for management access
 end
-copy running-config startup-config
 ```
 
 ### Inter-VLAN Routing (Router-on-a-Stick)
 
 ```bash
 interface GigabitEthernet0/0/1.10
- encapsulation dot1Q 10
+ encapsulation dot1Q 10             # Tag VLAN 10
  ip address 192.168.10.1 255.255.255.0
 exit
 interface GigabitEthernet0/0/1.20
@@ -232,31 +232,54 @@ exit
 ### ✅ VLAN Verification
 
 ```bash
-show vlan brief
-show interfaces trunk
-show interfaces switchport
-show mac address-table vlan 10
-show ip interface brief
+show vlan brief                    # VLANs and port mappings
+show interfaces trunk              # Trunk info
+show interfaces switchport         # Port mode and VLANs
+show mac address-table vlan 10     # MACs in VLAN 10
+show ip interface brief            # IP status for all interfaces
 ```
 
 ---
 
 ## 🚫 Access Control Lists (ACL)
 
-### 1. Standard Numbered ACL
+### Syntax Overview
 
-```bash
-access-list 10 permit 192.168.1.0 0.0.0.255
-access-list 10 deny any
+#### Standard Numbered ACL (1–99, 1300–1999)
+
+```
+access-list <1-99> {permit | deny} <source> <wildcard-mask>
 ```
 
-### 2. Extended Numbered ACL
+#### Extended Numbered ACL (100–199, 2000–2699)
 
-```bash
-access-list 199 permit tcp 192.168.1.0 0.0.0.255 gt 1024 host 10.0.0.5 eq 22 established log
+```
+access-list <100-199> {permit | deny} <protocol> <source> <wildcard> [operator port] <destination> <wildcard> [operator port] [log]
 ```
 
-### 3. Named ACLs
+#### Named ACL
+
+```
+ip access-list [standard | extended] NAME
+ [permit | deny] ...
+```
+
+### Examples
+
+#### 1. Standard Numbered ACL
+
+```bash
+access-list 10 permit 192.168.1.0 0.0.0.255   # Allow subnet
+access-list 10 deny any                      # Block others
+```
+
+#### 2. Extended Numbered ACL
+
+```bash
+access-list 199 permit tcp 192.168.1.0 0.0.0.255 gt 1024 host 10.0.0.5 eq 22 established log   # Allow SSH to host
+```
+
+#### 3. Named ACLs
 
 ```bash
 ip access-list standard BLOCK_INTERNET
@@ -273,7 +296,7 @@ exit
 
 access-list 23 permit 192.168.1.0 0.0.0.255
 line vty 0 4
- access-class 23 in
+ access-class 23 in               # Restrict VTY login
  login
 ```
 
@@ -289,11 +312,12 @@ no ip access-group 101 in
 ```bash
 show access-lists
 show ip access-lists
-show ip interface <int>
-debug ip packet
+show ip interface <int>          # See applied ACLs
+debug ip packet                  # Packet match logs (careful)
 ```
 
 > ⚠️ ACLs are processed top-down. First match wins. One ACL per direction/interface/protocol.
+> Best practice: Standard ACLs should be applied closest to the destination, extended ACLs closest to the source.
 
 ---
 
@@ -341,10 +365,10 @@ exit
 ### ✅ NAT Verification
 
 ```bash
-show ip nat translations
-show ip nat statistics
-debug ip nat
-clear ip nat translation *
+show ip nat translations          # NAT table
+show ip nat statistics            # NAT stats
+debug ip nat                      # Debug NAT (careful)
+clear ip nat translation *        # Reset NAT table
 ```
 
 ---
