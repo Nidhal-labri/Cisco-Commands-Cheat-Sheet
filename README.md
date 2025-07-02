@@ -371,6 +371,147 @@ show ip nat statistics            # NAT stats
 debug ip nat                      # Debug NAT (careful)
 clear ip nat translation *        # Reset NAT table
 ```
+---
+## 🕸️ Spanning Tree Protocol (STP)
+
+### 1. STP Modes (Global Configuration)
+
+```bash
+spanning-tree mode pvst             # Per-VLAN STP (default on many IOS)
+spanning-tree mode rapid-pvst       # Rapid PVST+ (faster convergence)
+spanning-tree mode mst              # Multiple Spanning Tree (MSTP)
+```
+
+### 2. Root Bridge Configuration (Per VLAN)
+
+```bash
+spanning-tree vlan 10 priority 24576         # Set bridge priority
+spanning-tree vlan 10 root primary           # Automatically lower priority to become root
+spanning-tree vlan 10 root secondary         # Set as backup root bridge
+```
+
+> Lower priority → higher chance of becoming root (default = 32768).
+
+### 3. PortFast (Access Ports Only)
+
+```bash
+interface FastEthernet0/1
+ spanning-tree portfast              # Immediately transition to forwarding state
+exit
+```
+
+To enable globally:
+
+```bash
+spanning-tree portfast default
+```
+
+### 4. BPDU Guard
+
+```bash
+interface FastEthernet0/1
+ spanning-tree bpduguard enable     # Disable port if BPDU received (on PortFast)
+exit
+```
+
+Globally:
+
+```bash
+spanning-tree portfast bpduguard default
+```
+
+### 5. BPDU Filter
+
+```bash
+interface FastEthernet0/1
+ spanning-tree bpdufilter enable     # Suppress BPDUs (in/out)
+exit
+```
+
+> ⚠️ Use only if you're sure no BPDUs should exist.
+
+### 6. Root Guard
+
+```bash
+interface FastEthernet0/2
+ spanning-tree guard root           # Prevent other switches from becoming root
+exit
+```
+
+### 7. Loop Guard
+
+```bash
+interface FastEthernet0/3
+ spanning-tree guard loop           # Prevents unidirectional link issues
+exit
+```
+
+### 8. UplinkFast *(Legacy)*
+
+```bash
+spanning-tree uplinkfast            # Rapid failover on access switches (deprecated in RPVST)
+```
+
+### 9. BackboneFast *(Legacy)*
+
+```bash
+spanning-tree backbonefast          # Speeds up indirect link failure convergence
+```
+
+### 10. Port Cost and Priority
+
+```bash
+interface FastEthernet0/4
+ spanning-tree cost 10              # Manually set path cost
+ spanning-tree port-priority 64     # Lower priority = more preferred (default is 128)
+exit
+```
+
+### 11. STP Timer Configuration (Advanced)
+
+```bash
+spanning-tree vlan 10 hello-time 2         # Time between BPDUs
+spanning-tree vlan 10 forward-time 15      # Time in listening/learning
+spanning-tree vlan 10 max-age 20           # Max age before topology change
+```
+
+> ⚠️ Modify only if you fully understand STP.
+
+### 12. Disable STP on a VLAN
+
+```bash
+no spanning-tree vlan 99                   # Disable STP for VLAN 99
+```
+
+> ⚠️ Not recommended unless necessary.
+
+### 13. MSTP Configuration
+
+```bash
+spanning-tree mode mst
+spanning-tree mst configuration
+ name CORE
+ revision 1
+ instance 1 vlan 10,20,30
+exit
+```
+
+### ✅ 14. STP Verification
+
+```bash
+show spanning-tree                         # Global STP status
+show spanning-tree vlan 10                 # Per-VLAN STP details
+show spanning-tree root                    # Identify current root
+show spanning-tree interface f0/1 detail   # Port-specific STP info
+show spanning-tree summary
+```
+
+### 🧪 15. STP Debug and Logging
+
+```bash
+debug spanning-tree events
+debug spanning-tree bpdu
+```
 
 ---
 
