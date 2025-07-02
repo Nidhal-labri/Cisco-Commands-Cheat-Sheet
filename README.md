@@ -380,6 +380,6 @@ Contributions, corrections, and improvements are welcome. Open a pull request or
 
 ---
 
-**Made with 💻 by Nidhal**
-** [LinkedIn](https://www.linkedin.com/in/nidhal-labri/) **
+**Made with 💻 by Nidhal** | **[LinkedIn](https://www.linkedin.com/in/nidhal-labri/)**
+
 
